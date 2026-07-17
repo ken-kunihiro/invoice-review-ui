@@ -1,0 +1,7 @@
+_offices/
+_inbox/
+.env
+rules.local.txt
+__pycache__/
+*.pyc
+*_backup_*

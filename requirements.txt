@@ -1,0 +1,15 @@
+# 証憑レビューUI 依存パッケージ
+anthropic>=0.83
+pdfplumber>=0.11
+PyMuPDF>=1.26
+pillow>=10
+python-dotenv>=1.0
+
+# Windows標準OCR（読み取り根拠ハイライトの実測表示に使用。無くても動くが推奨）
+winrt-runtime>=3.2
+winrt-Windows.Foundation>=3.2
+winrt-Windows.Foundation.Collections>=3.2
+winrt-Windows.Globalization>=3.2
+winrt-Windows.Graphics.Imaging>=3.2
+winrt-Windows.Media.Ocr>=3.2
+winrt-Windows.Storage.Streams>=3.2
