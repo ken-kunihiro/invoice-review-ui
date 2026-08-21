@@ -23,6 +23,7 @@ from collections import Counter
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
+from urllib.request import urlopen
 
 try:
     import pdfplumber
@@ -1566,6 +1567,15 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
 
 
+def _is_own_server_running(port: int, timeout: float = 1.5) -> bool:
+    """指定ポートに何か応答するサーバーがいるか確認する（二重起動時のブラウザ再オープン判定用）。"""
+    try:
+        with urlopen(f"http://127.0.0.1:{port}/", timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
 def main():
     global ROOT
 
@@ -1611,7 +1621,14 @@ def main():
     try:
         server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     except OSError:
-        print(f"ポート{args.port}は使用中です（既にサーバーが起動しています）")
+        # ポートが使用中 → 既にこのツールが起動済みの可能性が高いので疎通確認する。
+        # 応答があればエラー扱いにせず、そのままブラウザを開いて正常終了（start.batの二重起動対策）。
+        if _is_own_server_running(args.port):
+            print(f"既にサーバーが起動しています（http://127.0.0.1:{args.port}）。ブラウザを開きます。")
+            if not args.no_browser:
+                webbrowser.open(f"http://127.0.0.1:{args.port}")
+            return
+        print(f"ポート{args.port}は使用中ですが応答がありません（別のアプリが使用中の可能性があります）")
         sys.exit(1)
     server.daemon_threads = True
 
