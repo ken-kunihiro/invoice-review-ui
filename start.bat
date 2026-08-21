@@ -1,6 +1,7 @@
 @echo off
-rem Shoko Review UI launcher (ASCII only to avoid codepage issues)
+rem Shoko Review UI launcher
 setlocal
+chcp 65001 >nul
 cd /d "%~dp0"
 
 rem --- Pythonの検出 ---
@@ -53,15 +54,10 @@ if "%NEED_INSTALL%"=="1" (
 )
 
 rem --- デスクトップショートカットの作成（初回のみ） ---
+rem 1行のコマンドで完結させる（複数行continuationは文字化けで壊れやすいため使わない）。
+rem ショートカット名はUnicodeコードポイントから組み立てる（.batファイル自体には日本語バイト列を含めない）。
 if not exist ".venv\.shortcut_created" (
-  powershell -NoProfile -Command ^
-    "$ws = New-Object -ComObject WScript.Shell;" ^
-    "$desktop = [Environment]::GetFolderPath('Desktop');" ^
-    "$lnk = $ws.CreateShortcut((Join-Path $desktop '証憑レビューUI.lnk'));" ^
-    "$lnk.TargetPath = '%~f0';" ^
-    "$lnk.WorkingDirectory = '%~dp0';" ^
-    "$lnk.IconLocation = '%SystemRoot%\System32\shell32.dll,13';" ^
-    "$lnk.Save()" >nul 2>nul
+  powershell -NoProfile -Command "$n=[char]0x8A3C+[char]0x6191+[char]0x30EC+[char]0x30D3+[char]0x30E5+[char]0x30FC+'UI'; $ws=New-Object -ComObject WScript.Shell; $d=[Environment]::GetFolderPath('Desktop'); $lnk=$ws.CreateShortcut((Join-Path $d ($n+'.lnk'))); $lnk.TargetPath='%~f0'; $lnk.WorkingDirectory='%~dp0'; $lnk.IconLocation='%SystemRoot%\System32\shell32.dll,13'; $lnk.Save()" >nul 2>nul
   echo. > ".venv\.shortcut_created"
 )
 
