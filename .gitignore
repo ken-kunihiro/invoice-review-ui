@@ -5,3 +5,4 @@ rules.local.txt
 __pycache__/
 *.pyc
 *_backup_*
+.venv/
